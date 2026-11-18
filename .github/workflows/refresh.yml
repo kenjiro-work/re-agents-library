@@ -1,0 +1,50 @@
+# Rebuilds catalog.json once a day (stars, activity, new skills) and whenever repos.txt
+# changes. Public repository, so these runs cost no Actions minutes.
+name: Refresh library
+
+on:
+  schedule:
+    - cron: "17 4 * * *" # daily, 04:17 UTC (off the hour, when GitHub is less busy)
+  push:
+    branches: [main]
+    paths: [repos.txt, build.mjs]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build catalog.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node build.mjs
+      - name: Check it before publishing
+        run: |
+          node -e '
+            const c = JSON.parse(require("fs").readFileSync("catalog.json", "utf8"));
+            if (c.format !== 1) throw new Error("format");
+            if (c.repos.length < 20 || c.skills.length < 200) throw new Error(`too small: ${c.repos.length} repos, ${c.skills.length} skills`);
+            const repoOk = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+            for (const s of c.skills) if (!repoOk.test(s.repo) || s.path.includes("..") || s.path.startsWith("/")) throw new Error(`bad entry ${s.repo}/${s.path}`);
+            console.log(`${c.repos.length} repos, ${c.skills.length} skills`);
+          '
+      - name: Commit when something changed
+        run: |
+          if git diff --quiet -- catalog.json; then echo "No change."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add catalog.json
+          git commit -m "Refresh library $(date -u +%Y-%m-%d)"
+          git push
