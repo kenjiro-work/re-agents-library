@@ -1,0 +1,69 @@
+# Repositories that make up the re-agents Library.
+# One owner/repo per line; anything after # is a note on why it is here.
+# `node build.mjs` rebuilds catalog.json from this list; an Action does it daily.
+# Reviewed 2026-11-18: every entry contains SKILL.md skills, is not archived, and was pushed to
+# within the last ~9 months.
+
+# --- Official: model vendors ---
+anthropics/skills                      # Anthropic's reference skills: docx/pdf/pptx/xlsx, design, artifacts
+anthropics/knowledge-work-plugins      # Anthropic: skills for sales, finance, legal, support, bio research
+openai/skills                          # OpenAI's curated Codex skills catalogue
+
+# --- Official: platforms and tools ---
+github/awesome-copilot                 # GitHub's community skills for Copilot and other agents (large; truncated)
+vercel-labs/agent-skills               # Vercel: React/Next.js performance, composition, deploy
+google/skills                          # Google Cloud, Firebase, Gemini and other Google products
+android/skills                         # Android team: Jetpack, Compose, CameraX, AGP upgrades
+microsoft/skills                       # Microsoft: Azure SDK and service skills
+cloudflare/skills                      # Cloudflare: Workers, Agents SDK, Durable Objects
+cloudflare/security-audit-skill        # Cloudflare: multi-phase security audit; one very popular skill
+huggingface/skills                     # Hugging Face: datasets, training, Hub CLI (ML)
+trailofbits/skills                     # Trail of Bits: security research, auditing, vulnerability hunting
+getsentry/skills                       # Sentry team's own engineering skills: code review, commits, writing
+expo/skills                            # Expo: React Native app building, upgrades, EAS
+remotion-dev/skills                    # Remotion: programmatic video in React
+supabase/agent-skills                  # Supabase: Postgres best practices and the Supabase platform
+stripe/ai                              # Stripe: payments, Connect and billing integration skills
+hashicorp/agent-skills                 # HashiCorp: Terraform and Packer (devops / infrastructure)
+obsidianmd/obsidian-skills             # Obsidian: notes, Markdown, JSON Canvas, Bases (personal knowledge)
+google-labs-code/stitch-skills          # Google Labs Stitch: UI design to React / React Native
+duckdb/duckdb-skills                   # DuckDB: query, convert and explore data files (data)
+apify/agent-skills                     # Apify: web scraping and Actor development
+janestreet/agent_skills                # Jane Street: Socratic tutor skill (learning)
+
+# --- Engineering workflow and code quality ---
+mattpocock/skills                      # Matt Pocock's engineering skills (TDD, code review, planning); most starred
+obra/superpowers                       # Superpowers: brainstorm/plan/TDD/debug methodology; hugely popular
+addyosmani/agent-skills                # Addy Osmani: production engineering (testing, perf, API design)
+garrytan/gstack                        # Garry Tan's gstack: review, QA, ship, retro roles
+affaan-m/ECC                           # Everything Claude Code: large harness skill set (truncated)
+wshobson/agents                        # Broad plugin collection across languages, infra, testing (truncated)
+EveryInc/compound-engineering-plugin   # Every's compound engineering: plan, work, review loop
+OthmanAdi/planning-with-files          # File-based planning for long-running tasks
+muratcankoylan/Agent-Skills-for-Context-Engineering  # Context engineering, memory and multi-agent design
+SawyerHood/dev-browser                 # Browser automation for testing web apps
+twostraws/SwiftUI-Agent-Skill          # Paul Hudson's SwiftUI skill (Apple platforms)
+
+# --- Design and frontend ---
+nextlevelbuilder/ui-ux-pro-max-skill   # UI/UX design intelligence: styles, palettes, design systems
+pbakaus/impeccable                     # Design vocabulary and critique for frontends
+Leonxlnx/taste-skill                   # Art direction and visual taste for frontends
+emilkowalski/skills                    # Emil Kowalski: animation and interface craft
+cathrynlavery/diagram-design           # Editorial diagrams
+zarazhangrui/frontend-slides           # HTML slide decks
+
+# --- Writing, marketing and product ---
+blader/humanizer                       # Removes signs of AI-generated writing
+coreyhaines31/marketingskills          # Marketing: CRO, copywriting, SEO, analytics
+AgriciDaniel/claude-seo                # Technical and content SEO audits
+phuryn/pm-skills                       # Product management: discovery, strategy, delivery
+
+# --- Research, science and data ---
+mvanhorn/last30days-skill              # Researches a topic across Reddit, X, YouTube, HN
+K-Dense-AI/scientific-agent-skills     # Science: bioinformatics, chemistry, databases (truncated)
+Orchestra-Research/AI-Research-SKILLs  # ML research and engineering: training, eval, inference
+Imbad0202/academic-research-skills     # Academic research, paper writing and peer review
+tradermonty/claude-trading-skills      # Finance: market analysis and trading research
+
+# --- Automation ---
+czlonkowski/n8n-skills                 # n8n workflow building
