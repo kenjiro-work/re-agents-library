@@ -53,8 +53,12 @@ function git(args, cwd, input) {
 function sparseClone(name, branch) {
   const dir = mkdtempSync(join(tmpdir(), "re-agents-library-"));
   git(["clone", "--quiet", "--depth", "1", "--filter=blob:none", "--no-checkout", "--branch", branch, `https://github.com/${name}.git`, dir]);
-  const paths = git(["ls-tree", "-r", "--name-only", "HEAD"], dir).split("\n").filter(Boolean);
-  return { dir, paths };
+  // "<mode> blob <hash>\t<path>" per file; 100755 marks an executable.
+  const entries = git(["ls-tree", "-r", "HEAD"], dir)
+    .split("\n")
+    .filter(Boolean)
+    .map((l) => ({ mode: l.split(" ")[0], path: l.slice(l.indexOf("\t") + 1) }));
+  return { dir, paths: entries.map((e) => e.path), entries };
 }
 
 function checkout(dir, files) {
@@ -213,15 +217,25 @@ function collect(repo) {
   const name = meta.full_name;
   if (name.toLowerCase() !== repo.toLowerCase()) warn(`${repo} now lives at ${name}`);
   const branch = meta.default_branch;
-  const { dir: clone, paths } = sparseClone(name, branch);
+  const { dir: clone, paths, entries } = sparseClone(name, branch);
   try {
-    return describe(meta, name, clone, paths);
+    return describe(meta, name, clone, paths, entries);
   } finally {
     rmSync(clone, { recursive: true, force: true });
   }
 }
 
-function describe(meta, name, clone, paths) {
+const SCRIPT_EXT = /\.(sh|bash|zsh|py|js|mjs|cjs|ts|rb|ps1|bat|cmd|exe)$/i;
+
+/** How many files a skill has, and those an agent could run (scripts and executables). */
+function contents(entries, dir) {
+  const prefix = dir ? dir + "/" : "";
+  const mine = entries.filter((e) => e.path.startsWith(prefix) && !e.path.slice(prefix.length).includes("node_modules/"));
+  const scripts = mine.filter((e) => e.mode === "100755" || SCRIPT_EXT.test(e.path)).map((e) => e.path.slice(prefix.length));
+  return { files: mine.length, scripts: scripts.slice(0, 10), scriptCount: scripts.length };
+}
+
+function describe(meta, name, clone, paths, entries) {
   const dirs = skillDirs(paths.map((path) => ({ type: "blob", path })), name);
   const wanted = dirs.map((d) => (d ? `${d}/SKILL.md` : "SKILL.md"));
   checkout(clone, wanted);
@@ -254,12 +268,17 @@ function describe(meta, name, clone, paths) {
     }
     names.add(key);
     const version = clean(asText(fm.version) || asText(fm.metadata?.version), 40) || null;
+    const c = dir ? contents(entries, dir) : { files: 0, scripts: [], scriptCount: 0 };
     skills.push({
       repo: name,
       path: dir,
       name: skillName,
       description: clean(asText(fm.description), MAX_DESCRIPTION),
       version,
+      // A skill at the repository's root shares it with everything else, so it isn't counted.
+      files: c.files,
+      scripts: c.scripts,
+      scriptCount: c.scriptCount,
     });
   }
   const truncated = available > skills.length;
