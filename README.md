@@ -16,6 +16,10 @@ with a `SKILL.md`.
 - **`toolkits.json`** is the reviewed list of toolkits: deep skill packages that let an agent make
   something (interfaces, videos, decks…), with what each makes, who makes it and how to spot that
   a project uses it. Services' own connectors aren't toolkits. It is copied into `catalog.json`.
+- **`does.json`** holds one written line per skill saying what a person can do with it (at most
+  90 characters, no "Use when…" wording), shown in re-agents' Find skills. Each line names the
+  description it was written for; when a skill's description changes, its line is left out until
+  it is written again. Skills without a line show their own description.
 - **`build.mjs`** builds it (`node build.mjs`; needs `git` and `gh`). A GitHub Action runs it
   every day and whenever the list changes, so the app always gets current numbers.
 

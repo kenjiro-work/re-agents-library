@@ -10,6 +10,7 @@
 // the token a GitHub Action gets. Everything fetched is data: nothing in a repository is run.
 
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -19,6 +20,8 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const INPUT = process.argv[2] ?? join(ROOT, "repos.txt");
 const OUTPUT = process.argv[3] ?? join(ROOT, "catalog.json");
 const TOOLKITS = join(ROOT, "toolkits.json");
+// One written line per skill saying what a person can do with it (does.json, see its `about`).
+const DOES = join(ROOT, "does.json");
 // Large repositories (Microsoft's, Google's, GitHub's own collections) hold 200–500 skills; 80 cut
 // most of them alphabetically. 300 keeps nearly all, at about 1.4 MB for the whole catalogue.
 const MAX_SKILLS_PER_REPO = 300;
@@ -339,6 +342,34 @@ function render(catalog) {
   );
 }
 
+/** The short hash of a description that a written line was written for. */
+export function descriptionHash(description) {
+  return createHash("sha1").update(description ?? "").digest("hex").slice(0, 10);
+}
+
+/**
+ * Adds each skill's written line (`does`) from does.json, only while its description is the one
+ * the line was written for: a changed description drops the line until it is written again, so a
+ * line never describes a skill that has changed. Skills without one show their description.
+ */
+function withDoes(skills) {
+  let lines = {};
+  try {
+    lines = JSON.parse(readFileSync(DOES, "utf8")).lines ?? {};
+  } catch (e) {
+    if (e.code !== "ENOENT") throw new Error(`does.json: ${e.message}`);
+  }
+  let kept = 0;
+  const out = skills.map((s) => {
+    const w = lines[`${s.repo}/${s.path}`];
+    if (!w || typeof w.line !== "string" || w.of !== descriptionHash(s.description)) return s;
+    kept++;
+    return { ...s, does: w.line };
+  });
+  console.error(`does.json: ${kept} of ${skills.length} skills have a written line`);
+  return out;
+}
+
 /**
  * Toolkits: deep skill packages that let an agent make something (see toolkits.json's `about`).
  * The list is reviewed by hand; each entry is checked for the fields the app needs, and for being
@@ -409,7 +440,8 @@ function main() {
     skillsByRepo.get(r.repo).sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0)),
   );
   const toolkits = readToolkits(repos);
-  const catalog = { format: 1, generated: today(), repos, skills, toolkits };
+  const written = withDoes(skills);
+  const catalog = { format: 1, generated: today(), repos, skills: written, toolkits };
   const text = render(catalog);
   JSON.parse(text); // sanity check
   mkdirSync(dirname(OUTPUT), { recursive: true });
