@@ -9,8 +9,13 @@ with a `SKILL.md`.
   Bulk collections of copied skills, archived repositories and look-alikes of official ones are
   left out.
 - **`catalog.json`** is built from that list: each repository's description, stars, last
-  activity and licence, and each skill's name, description and version, read from its front
-  matter.
+  activity, licence and the commit it was read from (marked `archived` when a listed repository
+  is archived later), and each skill's name, description (with its full length) and version,
+  read from its front matter. Up to 300 skills per repository. A run that finds over 10% fewer
+  repositories than the last one stops without publishing.
+- **`toolkits.json`** is the reviewed list of toolkits: deep skill packages that let an agent make
+  something (interfaces, videos, decks…), with what each makes, who makes it and how to spot that
+  a project uses it. Services' own connectors aren't toolkits. It is copied into `catalog.json`.
 - **`build.mjs`** builds it (`node build.mjs`; needs `git` and `gh`). A GitHub Action runs it
   every day and whenever the list changes, so the app always gets current numbers.
 

@@ -18,8 +18,14 @@ import { fileURLToPath } from "node:url";
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const INPUT = process.argv[2] ?? join(ROOT, "repos.txt");
 const OUTPUT = process.argv[3] ?? join(ROOT, "catalog.json");
-const MAX_SKILLS_PER_REPO = 80;
+const TOOLKITS = join(ROOT, "toolkits.json");
+// Large repositories (Microsoft's, Google's, GitHub's own collections) hold 200–500 skills; 80 cut
+// most of them alphabetically. 300 keeps nearly all, at about 1.4 MB for the whole catalogue.
+const MAX_SKILLS_PER_REPO = 300;
 const MAX_DESCRIPTION = 600;
+// A run that finds this much less than the last one is a failure (rate limit, outage), not news:
+// it stops without writing, so the published catalogue keeps yesterday's repositories.
+const MAX_DROP = 0.1;
 
 const warn = (msg) => console.error(`warning: ${msg}`);
 
@@ -208,9 +214,11 @@ function clean(s, max) {
 // ---------------------------------------------------------------------------------------------
 // Main
 
-function collect(repo) {
+function collect(repo, known) {
   const meta = gh(`repos/${repo}`);
-  if (meta.archived) {
+  // A repository archived after it was listed stays in, marked, so the app can warn people who
+  // installed from it; one that was already archived when first listed is left out.
+  if (meta.archived && !known.has(meta.full_name.toLowerCase())) {
     warn(`${repo} is archived; skipped`);
     return null;
   }
@@ -219,7 +227,12 @@ function collect(repo) {
   const branch = meta.default_branch;
   const { dir: clone, paths, entries } = sparseClone(name, branch);
   try {
-    return describe(meta, name, clone, paths, entries);
+    const got = describe(meta, name, clone, paths, entries);
+    // The commit it was read from, so "what changed since yours" can be told by commit: most
+    // skills (961 of 1,525 in November 2026) carry no version of their own.
+    got.repo.commit = git(["rev-parse", "HEAD"], clone).trim();
+    if (meta.archived) got.repo.archived = true;
+    return got;
   } finally {
     rmSync(clone, { recursive: true, force: true });
   }
@@ -269,11 +282,15 @@ function describe(meta, name, clone, paths, entries) {
     names.add(key);
     const version = clean(asText(fm.version) || asText(fm.metadata?.version), 40) || null;
     const c = dir ? contents(entries, dir) : { files: 0, scripts: [], scriptCount: 0 };
+    const fullDescription = clean(asText(fm.description), 0);
     skills.push({
       repo: name,
       path: dir,
       name: skillName,
       description: clean(asText(fm.description), MAX_DESCRIPTION),
+      // The whole description's length: claude.ai takes at most 200 characters, and the
+      // description above is cut at 600.
+      descriptionLength: fullDescription.length,
       version,
       // A skill at the repository's root shares it with everything else, so it isn't counted.
       files: c.files,
@@ -316,20 +333,61 @@ function render(catalog) {
     `  "format": ${catalog.format},\n` +
     `  "generated": ${JSON.stringify(catalog.generated)},\n` +
     `  "repos": [\n${rows(catalog.repos)}\n  ],\n` +
-    `  "skills": [\n${rows(catalog.skills)}\n  ]\n` +
+    `  "skills": [\n${rows(catalog.skills)}\n  ],\n` +
+    `  "toolkits": [\n${rows(catalog.toolkits)}\n  ]\n` +
     "}\n"
   );
 }
 
+/**
+ * Toolkits: deep skill packages that let an agent make something (see toolkits.json's `about`).
+ * The list is reviewed by hand; each entry is checked for the fields the app needs, and for being
+ * in repos.txt, so its numbers (stars, last change, licence) come with it.
+ */
+function readToolkits(repos) {
+  let list;
+  try {
+    list = JSON.parse(readFileSync(TOOLKITS, "utf8")).toolkits;
+  } catch (e) {
+    throw new Error(`toolkits.json: ${e.message}`);
+  }
+  const repoOk = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+  const known = new Set(repos.map((r) => r.repo.toLowerCase()));
+  const ids = new Set();
+  const out = [];
+  for (const k of list) {
+    const missing = ["id", "name", "makes", "kind", "by", "repo"].filter((f) => typeof k[f] !== "string" || !k[f].trim());
+    if (missing.length || !repoOk.test(k.repo) || (k.path ?? "").includes("..") || ids.has(k.id)) {
+      warn(`toolkits.json: ${k.id ?? "?"} is incomplete or repeated; left out`);
+      continue;
+    }
+    if (!known.has(k.repo.toLowerCase())) warn(`toolkits.json: ${k.repo} isn't in repos.txt, so its numbers are missing`);
+    ids.add(k.id);
+    out.push(k);
+  }
+  return out;
+}
+
+function previous() {
+  try {
+    const c = JSON.parse(readFileSync(OUTPUT, "utf8"));
+    return Array.isArray(c.repos) ? c.repos : [];
+  } catch {
+    return [];
+  }
+}
+
 function main() {
   const list = readRepoList(INPUT);
+  const before = previous();
+  const known = new Set(before.map((r) => r.repo.toLowerCase()));
   const repos = [];
   const skillsByRepo = new Map();
   for (const [i, repo] of list.entries()) {
     process.stderr.write(`[${i + 1}/${list.length}] ${repo}\n`);
     let got;
     try {
-      got = collect(repo);
+      got = collect(repo, known);
     } catch (e) {
       warn(`${repo}: ${e.message}; skipped`);
       continue;
@@ -340,15 +398,23 @@ function main() {
     skillsByRepo.set(got.repo.repo, got.skills);
   }
   repos.sort((a, b) => b.stars - a.stars || a.repo.localeCompare(b.repo));
+  // Repositories that were there yesterday and failed today: a run that loses many is a failure.
+  const lost = before.filter((r) => !repos.some((x) => x.repo.toLowerCase() === r.repo.toLowerCase()));
+  if (lost.length) warn(`not in this run: ${lost.map((r) => r.repo).join(", ")}`);
+  if (before.length && repos.length < before.length * (1 - MAX_DROP)) {
+    console.error(`stopped: ${repos.length} repositories against ${before.length} last time; ${OUTPUT} is left as it was`);
+    process.exit(1);
+  }
   const skills = repos.flatMap((r) =>
     skillsByRepo.get(r.repo).sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0)),
   );
-  const catalog = { format: 1, generated: today(), repos, skills };
+  const toolkits = readToolkits(repos);
+  const catalog = { format: 1, generated: today(), repos, skills, toolkits };
   const text = render(catalog);
   JSON.parse(text); // sanity check
   mkdirSync(dirname(OUTPUT), { recursive: true });
   writeFileSync(OUTPUT, text);
-  console.error(`wrote ${OUTPUT}: ${repos.length} repos, ${skills.length} skills, ${(text.length / 1024).toFixed(0)} KB`);
+  console.error(`wrote ${OUTPUT}: ${repos.length} repos, ${skills.length} skills, ${toolkits.length} toolkits, ${(text.length / 1024).toFixed(0)} KB`);
 }
 
 main();

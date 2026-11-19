@@ -1,0 +1,153 @@
+{
+  "format": 1,
+  "about": "Toolkits: deep skill packages that let an agent make something (interfaces, videos, decks…), made by people with the craft, kept up to date, and not a wrapper around a vendor's service. A toolkit meets all of: it produces a finished thing; it has depth (several skills or commands, references or scripts); it needs no account or key for its value; it changed in the last 90 days. And it is made by practitioners or the tool's own team, or widely used with examples. This list moves to the Library repository, refreshed daily.",
+  "toolkits": [
+    {
+      "id": "impeccable",
+      "name": "impeccable",
+      "makes": "interfaces with a real design system",
+      "kind": "interfaces",
+      "by": "pbakaus",
+      "maker": false,
+      "repo": "pbakaus/impeccable",
+      "path": ".claude/skills/impeccable",
+      "skills": [
+        "impeccable"
+      ],
+      "detect": {
+        "files": [
+          "DESIGN.md",
+          "PRODUCT.md"
+        ]
+      }
+    },
+    {
+      "id": "remotion",
+      "name": "Remotion",
+      "makes": "videos made with code",
+      "kind": "video",
+      "by": "the Remotion team",
+      "maker": true,
+      "repo": "remotion-dev/skills",
+      "path": "skills/remotion-best-practices",
+      "skills": [
+        "remotion-best-practices"
+      ],
+      "licenseUrl": "https://www.remotion.dev/license",
+      "detect": {
+        "npm": [
+          "remotion",
+          "@remotion/cli"
+        ],
+        "files": [
+          "remotion.config.ts",
+          "remotion.config.js"
+        ]
+      }
+    },
+    {
+      "id": "emil",
+      "name": "emilkowalski/skills",
+      "makes": "motion and interface polish",
+      "kind": "interfaces",
+      "by": "emilkowalski",
+      "maker": false,
+      "repo": "emilkowalski/skills",
+      "path": "",
+      "skills": [
+        "emil-design-eng",
+        "animate",
+        "review-animations",
+        "improve-animations",
+        "ask-emil"
+      ],
+      "detect": {
+        "npm": [
+          "motion",
+          "framer-motion"
+        ]
+      }
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "name": "UI UX Pro Max",
+      "makes": "design systems, palettes, banners and slides",
+      "kind": "interfaces",
+      "by": "nextlevelbuilder",
+      "maker": false,
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "path": ".claude/skills/ui-ux-pro-max",
+      "skills": [
+        "ui-ux-pro-max"
+      ]
+    },
+    {
+      "id": "anthropic-documents",
+      "name": "Anthropic's document skills",
+      "makes": "decks, Word documents, PDFs and spreadsheets",
+      "kind": "documents",
+      "by": "Anthropic",
+      "maker": true,
+      "repo": "anthropics/skills",
+      "path": "",
+      "skills": [
+        "pptx",
+        "docx",
+        "pdf",
+        "xlsx"
+      ]
+    },
+    {
+      "id": "frontend-slides",
+      "name": "Frontend Slides",
+      "makes": "slide decks as web pages",
+      "kind": "documents",
+      "by": "zarazhangrui",
+      "maker": false,
+      "repo": "zarazhangrui/frontend-slides",
+      "path": "plugins/frontend-slides/skills/frontend-slides",
+      "skills": [
+        "frontend-slides"
+      ]
+    },
+    {
+      "id": "diagram-design",
+      "name": "Diagram Design",
+      "makes": "editorial diagrams",
+      "kind": "diagrams",
+      "by": "cathrynlavery",
+      "maker": false,
+      "repo": "cathrynlavery/diagram-design",
+      "path": "skills/diagram-design",
+      "skills": [
+        "diagram-design"
+      ]
+    },
+    {
+      "id": "marketingskills",
+      "name": "Marketing Skills",
+      "makes": "copy, landing pages, ads, SEO and conversion work",
+      "kind": "marketing",
+      "by": "coreyhaines31",
+      "maker": false,
+      "repo": "coreyhaines31/marketingskills",
+      "path": "",
+      "skills": []
+    },
+    {
+      "id": "academic-research",
+      "name": "Academic Research Skills",
+      "makes": "research papers, reviews and literature screening",
+      "kind": "research",
+      "by": "Imbad0202",
+      "maker": false,
+      "repo": "Imbad0202/academic-research-skills",
+      "path": "",
+      "skills": [
+        "academic-paper",
+        "academic-pipeline",
+        "academic-paper-reviewer"
+      ]
+    }
+  ]
+}
