@@ -11,7 +11,7 @@ with a `SKILL.md`.
 - **`catalog.json`** is built from that list: each repository's description, stars, last
   activity, licence and the commit it was read from (marked `archived` when a listed repository
   is archived later), and each skill's name, description (with its full length) and version,
-  read from its front matter. Up to 300 skills per repository. A run that finds over 10% fewer
+  read from its front matter. Up to 600 skills per repository. A run that finds over 10% fewer
   repositories than the last one stops without publishing.
 - **`toolkits.json`** is the reviewed list of toolkits: deep skill packages that let an agent make
   something (interfaces, videos, decks…), with what each makes, who makes it and how to spot that

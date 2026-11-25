@@ -23,8 +23,10 @@ const TOOLKITS = join(ROOT, "toolkits.json");
 // One written line per skill saying what a person can do with it (does.json, see its `about`).
 const DOES = join(ROOT, "does.json");
 // Large repositories (Microsoft's, Google's, GitHub's own collections) hold 200–500 skills; 80 cut
-// most of them alphabetically. 300 keeps nearly all, at about 1.4 MB for the whole catalogue.
-const MAX_SKILLS_PER_REPO = 300;
+// most of them alphabetically, and 300 still cut ECC (331) and GitHub's awesome-copilot (482).
+// 600 keeps every listed repository whole, at about 2 MB for the whole catalogue; re-agents
+// accepts up to 8 MB.
+const MAX_SKILLS_PER_REPO = 600;
 const MAX_DESCRIPTION = 600;
 // A run that finds this much less than the last one is a failure (rate limit, outage), not news:
 // it stops without writing, so the published catalogue keeps yesterday's repositories.
