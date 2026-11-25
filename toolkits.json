@@ -6,6 +6,7 @@
       "id": "impeccable",
       "name": "impeccable",
       "makes": "interfaces with a real design system",
+      "tagline": "Design interfaces with a real design system behind them.",
       "kind": "interfaces",
       "by": "pbakaus",
       "maker": false,
@@ -25,6 +26,7 @@
       "id": "remotion",
       "name": "Remotion",
       "makes": "videos made with code",
+      "tagline": "Make videos with code, guided by the Remotion team's own skill.",
       "kind": "video",
       "by": "the Remotion team",
       "maker": true,
@@ -49,6 +51,7 @@
       "id": "emil",
       "name": "emilkowalski/skills",
       "makes": "motion and interface polish",
+      "tagline": "Polish motion and interface details.",
       "kind": "interfaces",
       "by": "emilkowalski",
       "maker": false,
@@ -72,6 +75,7 @@
       "id": "ui-ux-pro-max",
       "name": "UI UX Pro Max",
       "makes": "design systems, palettes, banners and slides",
+      "tagline": "Produce design systems, palettes, banners and slides.",
       "kind": "interfaces",
       "by": "nextlevelbuilder",
       "maker": false,
@@ -85,6 +89,7 @@
       "id": "anthropic-documents",
       "name": "Anthropic's document skills",
       "makes": "decks, Word documents, PDFs and spreadsheets",
+      "tagline": "Make decks, Word documents, PDFs and spreadsheets.",
       "kind": "documents",
       "by": "Anthropic",
       "maker": true,
@@ -101,6 +106,7 @@
       "id": "frontend-slides",
       "name": "Frontend Slides",
       "makes": "slide decks as web pages",
+      "tagline": "Turn a deck into slides that run as a web page.",
       "kind": "documents",
       "by": "zarazhangrui",
       "maker": false,
@@ -114,6 +120,7 @@
       "id": "diagram-design",
       "name": "Diagram Design",
       "makes": "editorial diagrams",
+      "tagline": "Draw diagrams in an editorial style.",
       "kind": "diagrams",
       "by": "cathrynlavery",
       "maker": false,
@@ -127,6 +134,7 @@
       "id": "marketingskills",
       "name": "Marketing Skills",
       "makes": "copy, landing pages, ads, SEO and conversion work",
+      "tagline": "Write copy and work on landing pages, ads, SEO and conversion.",
       "kind": "marketing",
       "by": "coreyhaines31",
       "maker": false,
@@ -138,6 +146,7 @@
       "id": "academic-research",
       "name": "Academic Research Skills",
       "makes": "research papers, reviews and literature screening",
+      "tagline": "Draft research papers, run reviews and screen literature.",
       "kind": "research",
       "by": "Imbad0202",
       "maker": false,
@@ -148,6 +157,96 @@
         "academic-pipeline",
         "academic-paper-reviewer"
       ]
+    },
+    {
+      "id": "expo",
+      "name": "Expo",
+      "makes": "iOS and Android apps with Expo",
+      "tagline": "Build iOS and Android apps with Expo, guided by the Expo team's own skills.",
+      "kind": "apps",
+      "by": "the Expo team",
+      "maker": true,
+      "repo": "expo/skills",
+      "path": "plugins/expo/skills/expo-overview",
+      "skills": [
+        "expo-overview",
+        "expo-native-ui",
+        "expo-router",
+        "expo-design-system",
+        "expo-animation",
+        "expo-data-fetching",
+        "expo-ui",
+        "expo-project-structure",
+        "expo-upgrade",
+        "expo-web-to-native"
+      ],
+      "licenseUrl": "https://github.com/expo/skills/blob/main/LICENSE",
+      "detect": {
+        "npm": [
+          "expo"
+        ],
+        "files": [
+          "eas.json"
+        ]
+      }
+    },
+    {
+      "id": "vercel-react",
+      "name": "Vercel's React skills",
+      "makes": "fast React and Next.js apps",
+      "tagline": "Build React and Next.js apps the way Vercel's engineers do.",
+      "kind": "apps",
+      "by": "Vercel, the Next.js team",
+      "maker": true,
+      "repo": "vercel-labs/agent-skills",
+      "path": "skills/react-best-practices",
+      "skills": [
+        "vercel-react-best-practices",
+        "vercel-composition-patterns",
+        "vercel-react-view-transitions",
+        "web-design-guidelines"
+      ],
+      "detect": {
+        "npm": [
+          "next"
+        ]
+      }
+    },
+    {
+      "id": "android",
+      "name": "Android's own skills",
+      "makes": "Android apps",
+      "tagline": "Build and modernise Android apps with the Android team's own skills.",
+      "kind": "apps",
+      "by": "the Android team at Google",
+      "maker": true,
+      "repo": "android/skills",
+      "path": "",
+      "skills": [],
+      "licenseUrl": "https://github.com/android/skills/blob/main/LICENSE.txt",
+      "detect": {
+        "files": [
+          "AndroidManifest.xml"
+        ]
+      }
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian's own skills",
+      "makes": "notes, canvases and bases for Obsidian",
+      "tagline": "Write notes, canvases and bases for your Obsidian vault.",
+      "kind": "documents",
+      "by": "the Obsidian team",
+      "maker": true,
+      "repo": "obsidianmd/obsidian-skills",
+      "path": "plugins/obsidian/skills/obsidian-markdown",
+      "skills": [
+        "obsidian-markdown",
+        "json-canvas",
+        "obsidian-bases",
+        "obsidian-cli"
+      ],
+      "licenseUrl": "https://github.com/obsidianmd/obsidian-skills/blob/main/LICENSE"
     }
   ]
 }
